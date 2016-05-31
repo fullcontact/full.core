@@ -1,14 +1,10 @@
-(defproject fullcontact/full.core "0.9.1-SNAPSHOT"
+(defproject fullcontact/full.core "0.10.0-SNAPSHOT"
   :description "FullContact's core Clojure library - logging, configuration and common helpers."
-
-  :url "https://github.com/fullcontact/full.monty"
-
+  :url "https://github.com/fullcontact/full.core"
   :license {:name "Eclipse Public License - v 1.0"
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :repo}
-
   :deploy-repositories [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]
-
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/tools.logging "0.3.1"]
@@ -19,9 +15,6 @@
                  [clj-yaml "0.4.0" :exclusions [org.yaml/snakeyaml]]
                  [org.yaml/snakeyaml "1.15"]
                  [commons-codec/commons-codec "1.10"]]
-
   :aot :all
-
   :plugins [[lein-midje "3.1.3"]]
-
   :profiles {:dev {:dependencies [[midje "1.7.0"]]}})
