@@ -8,7 +8,7 @@ It contains the following:
 
 * Config management
 * Logging
-* Various other small goodies
+* Sugar - small extensions to Clojure's core and other common libraries
 
 ### Config management
 

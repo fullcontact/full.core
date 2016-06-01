@@ -1,5 +1,5 @@
 (defproject fullcontact/full.core "0.10.0-SNAPSHOT"
-  :description "FullContact's core Clojure library - logging, configuration and common helpers."
+  :description "FullContact's core Clojure library - logging, configuration and sugar."
   :url "https://github.com/fullcontact/full.core"
   :license {:name "Eclipse Public License - v 1.0"
             :url "http://www.eclipse.org/legal/epl-v10.html"
@@ -16,5 +16,4 @@
                  [org.yaml/snakeyaml "1.15"]
                  [commons-codec/commons-codec "1.10"]]
   :aot :all
-  :plugins [[lein-midje "3.1.3"]]
-  :profiles {:dev {:dependencies [[midje "1.7.0"]]}})
+  :profiles {:dev {:plugins [[com.jakemccrary/lein-test-refresh "0.15.0"]]}})
