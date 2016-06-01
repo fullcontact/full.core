@@ -3,30 +3,30 @@
             [full.core.sugar :refer :all]))
 
 
-(facts "full.core.sugar/?assoc"
+(facts "?assoc"
   (?assoc {} :foo "bar") => {:foo "bar"}
   (?assoc {:foo "bar"} :foo "baz") => {:foo "baz"}
   (?assoc {:foo "bar"} :foo nil) => {:foo "bar"}
   (?assoc {} :empty nil) => {})
 
 
-(facts "about remove-prefix"
+(facts "remove-prefix"
   (remove-prefix "aaabbb" "aaa") => "bbb"
   (remove-prefix "aaabbb" "ccc") => "aaabbb"
   (remove-prefix nil "ccc") => nil)
 
 
-(facts "about remove-suffix"
+(facts "remove-suffix"
   (remove-suffix "aaabbb" "bbb") => "aaa"
   (remove-suffix "aaabbb" "ccc") => "aaabbb"
   (remove-suffix nil "ccc") => nil)
 
 
-(facts "about ascii"
+(facts "ascii"
   (ascii "ĀČĒāčēAce") => "ACEaceAce")
 
 
-(facts "about insert-at"
+(facts "insert-at"
   (insert-at [] 0 "x") => ["x"]
   (insert-at '() 0 "x") => '("x")
   (insert-at [] 5 "x") => ["x"]
@@ -36,7 +36,7 @@
   (insert-at [1 2 3 4] 5 0) => [1 2 3 4 0])
 
 
-(facts "about remove-at"
+(facts "remove-at"
   (remove-at [] 0) => []
   (remove-at '() 5) => '()
   (remove-at '(1 1 2 3) 1) => '(1 2 3)
@@ -54,7 +54,7 @@
   (?conj [1] nil 3) => [1 3])
 
 
-(facts "about conditional threading"
+(facts "conditional threading"
   (->> (range 10)
        (map inc)
        (when->> true (filter even?))) => '(2 4 6 8 10)
@@ -72,12 +72,12 @@
       (when-> false (str "baz"))) => "FOOBAR")
 
 
-(facts "about ?hash-map"
+(facts "?hash-map"
   (?hash-map :foo nil :bar nil :baz "xx") => {:baz "xx"}
   (?hash-map :foo nil ) => {})
 
 
-(facts "about update-last"
+(facts "update-last"
   (update-last [] inc) => []
   (update-last [1] inc) => [2]
   (update-last [1 2 3] inc) => [1 2 4]
@@ -85,7 +85,7 @@
   (update-last [1 2 3] + 10 20) => [1 2 33])
 
 
-(facts "about update-first"
+(facts "update-first"
   (update-first [] inc) => []
   (update-first [1] inc) => [2]
   (update-first [1 2 3] inc) => [2 2 3]
@@ -93,7 +93,7 @@
   (update-first [1 2 3] + 10 20) => [31 2 3])
 
 
-(facts "about number formatting"
+(facts "number formatting"
   (num->compact 0.1) => "0.1"
   (num->compact 0.11) => "0.11"
   (num->compact 0.19) => "0.19"
@@ -120,7 +120,7 @@
   (num->compact 1191125100000) => "1.19T")
 
 
-(facts "about ?update and ?update-in"
+(facts "?update and ?update-in"
   (?update-in {} [:foo] inc) => {}
   (?update-in {:foo 0} [:foo] inc) => {:foo 1}
   (?update-in {:foo 0} [:foo] (constantly nil)) => {}
@@ -132,22 +132,6 @@
   (?update {:foo 0} :foo (constantly nil)) => {})
 
 
-(facts "about juxt-partition"
+(facts "juxt-partition"
   (juxt-partition odd? [1 2 3 4] filter remove) => ['(1 3) '(2 4)]
   (juxt-partition odd? [1 2 3 4] remove filter) => ['(2 4) '(1 3)])
-
-
-(facts "about transients"
-  (facts "first!"
-    (first! (transient [4 2 8])) => 4
-    (first! (transient [])) => nil)
-
-  (facts "last!"
-    (last! (transient [5 6 7])) => 7
-    (last! (transient [])) => nil)
-
-  (facts "update-last!"
-    (persistent! (update-last! (transient [1 4 10]) inc)) => [1 4 11])
-
-  (facts "update-first!"
-    (persistent! (update-first! (transient [1 4 10]) inc)) => [2 4 10]))

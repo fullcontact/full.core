@@ -25,17 +25,6 @@
     (assoc m k (first v))
     m))
 
-(defn transf
-  "Transforms the value of key `k` in map `m` by applying function `f`."
-  [m f k]
-  (assoc m k (f (get m k))))
-
-(defn ?transf
-  "Same as transform, but will remove the `k` from `m`
-  if the transformed value is falsy."
-  [m f k]
-  (?assoc m k (f (get m k))))
-
 (defn remove-empty-val
   "Filter empty? values from map."
   [m]
@@ -44,7 +33,7 @@
                                         (seq v)))) m)))
 
 (defn remove-nil-val
-  "Filter nil? values from map."
+  "Filter nil values from a map m."
   [m]
   (into {} (remove (comp nil? val) m)))
 
@@ -70,7 +59,7 @@
     m))
 
 (defn ?update
-  "Performs a clojure.core/update if the original or resulting value is not nil,
+  "Performs a clojure.core/update if the original or resulting value is truthy,
   otherwise dissoc key."
   [m k f & args]
   (if-let [newv (when-let [v (get m k)] (apply f v args))]
@@ -78,8 +67,8 @@
     (dissoc m k)))
 
 (defn ?update-in
-  "Performs a clojure.core/update-in if the original or
-   resulting value is not nil, otherwise dissoc key."
+  "Performs a clojure.core/update-in if the original or resulting value is
+  truthy, otherwise dissoc key."
   [m [k & ks] f & args]
   (if ks
     (assoc m k (apply ?update-in (get m k) ks f args))
@@ -138,21 +127,16 @@
   (apply conj (into (empty s) (take idx s)) (cons i (nthrest s (inc idx)))))
 
 (defn ?conj
-  "Same as conj, but skip the conj if v is nil"
+  "Same as conj, but skip the conj if v is falsey"
   [coll & xs]
-  (let [filtered (filter identity xs)]
-    (if (empty? filtered)
-      coll
-      (apply (partial conj coll) filtered))))
+  (apply conj coll (filter identity xs)))
 
 
 ;;; Seq helpers
 
 (defn pipe
   "Returns a vector containing a sequence that will read from the
-   queue, and a function that inserts items into the queue.
-
-   Source: http://clj-me.cgrand.net/2010/04/02/pipe-dreams-are-not-necessarily-made-of-promises/"
+   queue, and a function that inserts items into the queue."
   []
   (let [q (LinkedBlockingQueue.)
         EOQ (Object.)
@@ -179,7 +163,8 @@
 (defn idx-of
   "Similar to .indexOf, but works with lazy collections as well."
   [collection item]
-  (or (first (some-when (fn [{v 1}] (= v item)) (map-indexed vector collection)))
+  (or (first (some-when (fn [{v 1}] (= v item))
+                        (map-indexed vector collection)))
       -1))
 
 (defn update-last
@@ -212,33 +197,13 @@
   ((apply juxt (map #(partial % pred) fns)) coll))
 
 
-;;; Transient helpers
-
-(defn first! [c] (get c 0))
-(defn last! [c] (get c (dec (count c))))
-
-(defn update-last!
-  "Applies the method m to the last item in a transient sequence"
-  [s m]
-  (if-not (empty s)
-    (assoc! s (dec (count s)) (m (last! s)))
-    s))
-
-(defn update-first!
-  "Applies the method m to the first item in a transient sequence"
-  [s m]
-  (if-not (empty s)
-    (assoc! s 0 (m (first! s)))
-    s))
-
-
 ;;; String helpers
 
 (defn as-long [s]
   (when s
     (try
       (Long/parseLong (str s))
-      (catch NumberFormatException _ nil))))
+      (catch NumberFormatException _))))
 
 (defn number-or-string [s]
   (try
@@ -261,7 +226,8 @@
     s))
 
 (defn ascii
-  "Ensures all characters in the given string are converted to ASCII (such as ā->a)."
+  "Ensures all characters in the given string are converted to ASCII.
+   For example: ā->a."
   [s]
   (.replaceAll (Normalizer/normalize s Normalizer$Form/NFD)
                "\\p{InCombiningDiacriticalMarks}+"
@@ -279,7 +245,8 @@
 (defn strip
   "Takes a string s and a string cs. Removes all cs characters from s."
   [s cs]
-  (apply str (remove #((set cs) %) s)))
+  (let [cs-set (set cs)]
+    (apply str (remove cs-set s))))
 
 (defn uuid [] (string/replace (str (java.util.UUID/randomUUID)) "-" ""))
 
@@ -326,15 +293,16 @@
   [obj]
   (-> obj meta :name))
 
-(defmacro with-mname [name & body]
-  `(with-meta ~@body {:name ~name}))
+(defmacro with-mname [meta-name body]
+  `(with-meta ~body {:name ~meta-name}))
 
-(defmacro fn-name [name args & body]
-  `(with-mname ~name (fn ~args ~@body)))
+(defmacro fn-name [meta-name args & body]
+  `(with-mname ~meta-name (fn ~args ~@body)))
 
 (defmethod print-method clojure.lang.AFunction [v ^java.io.Writer w]
   ; if function has :name in metadata, this will make it appear in (print ...)
   (.write w (or (mname v) (str v))))
+
 
 ;;; Conditional threading
 
@@ -430,8 +398,8 @@
 ;;; Numbers
 
 (defn format-opt-prec
-  [num precision]
-  (loop [v (format (str "%." precision "f") (double num))]
+  [n precision]
+  (loop [v (format (str "%." precision "f") (double n))]
     (if (pos? precision)
       (let [length (.length v)
             lc (.charAt v (dec length))]
@@ -443,11 +411,11 @@
       v)))
 
 (defn num->compact
-  [num & {:keys [prefix suffix]}]
-  (when num
-    (let [abs (Math/abs (double num))]
+  [n & {:keys [prefix suffix]}]
+  (when n
+    (let [abs (Math/abs (double n))]
       (str
-        (if (neg? num) "-" "")
+        (if (neg? n) "-" "")
         prefix
         (cond
           (> 10 abs) (format-opt-prec abs 2)
