@@ -4,7 +4,8 @@
      :cljs (:require [cemerick.cljs.test :refer-macros [deftest is done]]
                      [full.core.sugar
                       :refer [?assoc insert-at remove-at ?conj ?hash-map update-first update-last ?update-in ?update
-                              juxt-partition]
+                              juxt-partition as-long number-or-string remove-prefix replace-prefix remove-suffix dq
+                              query-string num->compact]
                       :refer-macros [when->> when->]])))
 
 (deftest test-?assoc
@@ -14,17 +15,26 @@
   (is (= (?assoc {:foo "bar"} :foo nil) {:foo "bar"}))
   (is (= (?assoc {} :empty nil) {})))
 
-#?(:clj
-   (deftest test-remove-prefix
-     (is (= (remove-prefix "aaabbb" "aaa") "bbb"))
-     (is (= (remove-prefix "aaabbb" "ccc") "aaabbb"))
-     (is (= (remove-prefix nil "ccc") nil))))
+(deftest test-remove-prefix
+  (is (= (remove-prefix "aaabbb" "aaa") "bbb"))
+  (is (= (remove-prefix "aaabbb" "ccc") "aaabbb"))
+  (is (= (remove-prefix nil "ccc") nil)))
 
-#?(:clj
-   (deftest test-remove-suffix
-       (is (= (remove-suffix "aaabbb" "bbb") "aaa"))
-       (is (= (remove-suffix "aaabbb" "ccc") "aaabbb"))
-       (is (= (remove-suffix nil "ccc") nil))))
+(deftest test-replace-prefix
+  (is (= (replace-prefix "aaabbb" "aaa" "1") "1bbb"))
+  (is (= (replace-prefix "aaabbb" "ccc" "2") "aaabbb"))
+  (is (= (replace-prefix nil "ccc" "3") nil)))
+
+(deftest test-remove-suffix
+   (is (= (remove-suffix "aaabbb" "bbb") "aaa"))
+   (is (= (remove-suffix "aaabbb" "ccc") "aaabbb"))
+   (is (= (remove-suffix nil "ccc") nil)))
+
+(deftest test-dq
+  (is (= (dq "'x'") "\"x\"")))
+
+(deftest test-query-string
+  (is (= (query-string {:a "x" :b 1}) "a=x&b=1")))
 
 #?(:clj
    (deftest test-ascii
@@ -91,32 +101,31 @@
   (is (= (update-first [1 2 3] + 10) [11 2 3]))
   (is (= (update-first [1 2 3] + 10 20) [31 2 3])))
 
-#?(:clj
-   (deftest test-num->compact
-     (is (= (num->compact 0.1) "0.1"))
-     (is (= (num->compact 0.11) "0.11"))
-     (is (= (num->compact 0.19) "0.19"))
-     (is (= (num->compact 0.191) "0.19"))
-     (is (= (num->compact 0.199) "0.2"))
-     (is (= (num->compact 1) "1"))
-     (is (= (num->compact 1.12) "1.12"))
-     (is (= (num->compact 10.12) "10.1"))
-     (is (= (num->compact 100.12) "100"))
-     (is (= (num->compact 1000) "1K"))
-     (is (= (num->compact 1290) "1.29K"))
-     (is (= (num->compact 1029) "1.03K"))
-     (is (= (num->compact 10290) "10.3K"))
-     (is (= (num->compact 102900) "103K"))
-     (is (= (num->compact 950050) "950K"))
-     (is (= (num->compact 1000000) "1M"))
-     (is (= (num->compact 1200000) "1.2M"))
-     (is (= (num->compact 1251000) "1.25M"))
-     (is (= (num->compact 11251000) "11.3M"))
-     (is (= (num->compact 911251000) "911M"))
-     (is (= (num->compact 1911251000) "1.91B"))
-     (is (= (num->compact 11911251000) "11.9B"))
-     (is (= (num->compact 119112510000) "119B"))
-     (is (= (num->compact 1191125100000) "1.19T"))))
+(deftest test-num->compact
+  (is (= (num->compact 0.1) "0.1"))
+  (is (= (num->compact 0.11) "0.11"))
+  (is (= (num->compact 0.19) "0.19"))
+  (is (= (num->compact 0.191) "0.19"))
+  (is (= (num->compact 0.199) "0.2"))
+  (is (= (num->compact 1) "1"))
+  (is (= (num->compact 1.12) "1.12"))
+  (is (= (num->compact 10.12) "10.1"))
+  (is (= (num->compact 100.12) "100"))
+  (is (= (num->compact 1000) "1K"))
+  (is (= (num->compact 1290) "1.29K"))
+  (is (= (num->compact 1029) "1.03K"))
+  (is (= (num->compact 10290) "10.3K"))
+  (is (= (num->compact 102900) "103K"))
+  (is (= (num->compact 950050) "950K"))
+  (is (= (num->compact 1000000) "1M"))
+  (is (= (num->compact 1200000) "1.2M"))
+  (is (= (num->compact 1251000) "1.25M"))
+  (is (= (num->compact 11251000) "11.3M"))
+  (is (= (num->compact 911251000) "911M"))
+  (is (= (num->compact 1911251000) "1.91B"))
+  (is (= (num->compact 11911251000) "11.9B"))
+  (is (= (num->compact 119112510000) "119B"))
+  (is (= (num->compact 1191125100000) "1.19T")))
 
 (deftest test-?update-in
   (is (= (?update-in {} [:foo] inc) {}))
@@ -133,3 +142,13 @@
 (deftest test-juxt-partition
   (is (= (juxt-partition odd? [1 2 3 4] filter remove) ['(1 3) '(2 4)]))
   (is (= (juxt-partition odd? [1 2 3 4] remove filter) ['(2 4) '(1 3)])))
+
+(deftest test-as-long
+  (is (= (as-long "123") 123))
+  (is (= (as-long 123) 123))
+  (is (= (as-long "abc") nil)))
+
+(deftest test-number-or-string
+  (is (= (number-or-string "123") 123))
+  (is (= (number-or-string 123) 123))
+  (is (= (number-or-string "abc") "abc")))

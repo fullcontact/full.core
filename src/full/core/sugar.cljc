@@ -1,10 +1,13 @@
 (ns full.core.sugar
+  (:require
+    [clojure.walk :refer [postwalk]]
+    [clojure.string :as string]
+    #?@(:cljs [[goog.string :as gstring]
+               [goog.string.format]]))
   #?(:clj (:import (java.text Normalizer Normalizer$Form)
                    (org.apache.commons.codec.binary Hex)
                    (java.net URLEncoder)
-                   (java.util.concurrent LinkedBlockingQueue)))
-  (:require [clojure.walk :refer [postwalk]]
-            [clojure.string :as string]))
+                   (java.util.concurrent LinkedBlockingQueue))))
 
 
 ;;; Macro helpers
@@ -217,34 +220,85 @@
 
 ;;; String helpers
 
+
+(defn as-long [s]
+  (when s
+    #?(:clj (try
+              (Long/parseLong (str s))
+              (catch NumberFormatException _))
+       :cljs (let [n (js/parseInt (str s))]
+               (when-not (js/isNaN n)
+                 n))
+       )))
+
+(defn number-or-string [s]
+  (let [s (str s)]
+    #?(:clj (try
+              (Long/parseLong s)
+              (catch Exception _ s))
+       :cljs (let [n (js/parseInt (str s))]
+               (if (js/isNaN n)
+                 s
+                 n)))))
+
+(defn remove-prefix [s prefix]
+  (if (and s (string/starts-with? s prefix))
+    (subs s (count prefix))
+    s))
+
+(defn replace-prefix [s prefix new-prefix]
+  (if (and s (string/starts-with? s prefix))
+    (str new-prefix (subs s (count prefix)))
+    s))
+
+(defn remove-suffix [s suffix]
+  (if (and s (string/ends-with? s suffix))
+    (subs s 0 (- (count s) (count suffix)))
+    s))
+
+(defn dq
+  "Converts single quotes to double quotes."
+  [s]
+  (string/replace s #"'" "\""))
+
+(defn query-string [m]
+  (string/join "&" (for [[k v] m]
+                (str (name k) "=" #?(:clj (URLEncoder/encode (str v) "UTF-8")
+                                     :cljs (js/encodeURIComponent (str v)))))))
+
+(defn strip
+  "Takes a string s and a string cs. Removes all cs characters from s."
+  [s cs]
+  (let [cs-set (set cs)]
+    (apply str (remove cs-set s))))
+
+(defn str-greater?
+  "Returns true if this is greater than that. Case insensitive."
+  [this that]
+  (pos? (compare (string/lower-case this) (string/lower-case that))))
+
+(defn str-smaller?
+  "Returns true if this is smaller than that. Case insensitive."
+  [this that]
+  (neg? (compare (string/lower-case this) (string/lower-case that))))
+
+(defn uuids
+  "Generates UUID without dashes."
+  []
+  #?(:clj (string/replace (str (java.util.UUID/randomUUID)) "-" "")
+     :cljs (letfn [(top-32-bits [] (.toString (int (/ (.getTime (js/Date.)) 1000)) 16))
+                   (f [] (.toString (rand-int 16) 16))
+                   (g [] (.toString  (bit-or 0x8 (bit-and 0x3 (rand-int 15))) 16))]
+             (string/join (concat (top-32-bits)
+                                  (repeatedly 4 f) "4"
+                                  (repeatedly 3 f)
+                                  (g) (repeatedly 3 f)
+                                  (repeatedly 12 f))))))
+
+#?(:clj (def ^{:deprecated "Use uuids instead"} uuid uuids))
+
 #?(:clj
    (do
-     (defn as-long [s]
-       (when s
-         (try
-           (Long/parseLong (str s))
-           (catch NumberFormatException _))))
-
-     (defn number-or-string [s]
-       (try
-         (Long/parseLong s)
-         (catch Exception _ s)))
-
-     (defn remove-prefix [s prefix]
-       (if (and s (.startsWith s prefix))
-         (.substring s (.length prefix))
-         s))
-
-     (defn replace-prefix [s prefix new-prefix]
-       (if (and s (.startsWith s prefix))
-         (str new-prefix (.substring s (.length prefix)))
-         s))
-
-     (defn remove-suffix [s suffix]
-       (if (and s (.endsWith s suffix))
-         (.substring s 0 (- (.length s) (.length suffix)))
-         s))
-
      (defn ascii
        "Ensures all characters in the given string are converted to ASCII.
         For example: ā->a."
@@ -252,23 +306,6 @@
        (.replaceAll (Normalizer/normalize s Normalizer$Form/NFD)
                     "\\p{InCombiningDiacriticalMarks}+"
                     ""))
-
-     (defn dq
-       "Converts single quotes to double quotes."
-       [s]
-       (.replaceAll s "'" "\""))
-
-     (defn query-string [m]
-       (clojure.string/join "&"
-                            (for [[k v] m] (str (name k) "=" (URLEncoder/encode (str v) "UTF-8")))))
-
-     (defn strip
-       "Takes a string s and a string cs. Removes all cs characters from s."
-       [s cs]
-       (let [cs-set (set cs)]
-         (apply str (remove cs-set s))))
-
-     (defn uuid [] (string/replace (str (java.util.UUID/randomUUID)) "-" ""))
 
      (defn byte-buffer->byte-vector [bb]
        (loop [byte-vector []]
@@ -280,18 +317,8 @@
        (->> (byte-buffer->byte-vector byte-buffer)
             (into-array Byte/TYPE)
             (Hex/encodeHex)
-            (clojure.string/join)))
+            (string/join)))
      ))
-
-(defn str-greater?
-  "Returns true if this is greater than that. Case insensitive."
-  [this that]
-  (pos? (compare (string/lower-case this) (string/lower-case that))))
-
-(defn str-smaller?
-  "Returns true if this is smaller than that. Case insensitive."
-  [this that]
-  (neg? (compare (string/lower-case this) (string/lower-case that))))
 
 
 ;;; Metadata helpers
@@ -410,59 +437,61 @@
 
 ;;; Helpers for measuring execution time
 
-#?(:clj
-   (do
-     (defn time-bookmark
-       "Returns time bookmark (technically system time in nanoseconds).
-       For use in concert with ellapsed-time to messure execution time
-       of some code block."
-       []
-       (. System (nanoTime)))
 
-     (defn ellapsed-time
-       "Returns ellapsed time in milliseconds since the time bookmark."
-       [time-bookmark]
-       (/ (double (- (. System (nanoTime)) time-bookmark)) 1000000.0))
-     ))
+(defn time-bookmark
+  "Returns time bookmark (technically system time in nanoseconds).
+  For use in concert with ellapsed-time to messure execution time
+  of some code block."
+  []
+  #?(:clj (. System (nanoTime))
+     :cljs (. (js/Date.) getTime)))
+
+(defn ellapsed-time
+  "Returns ellapsed time in milliseconds since the time bookmark."
+  [time-bookmark]
+  #?(:clj (/ (double (- (. System (nanoTime)) time-bookmark)) 1000000.0)
+     :cljs (- (. (js/Date.) getTime) time-bookmark)))
+
 
 ;;;; Numbers
 
-#?(:clj
-   (do
-     (defn format-opt-prec
-       [n precision]
-       (loop [v (format (str "%." precision "f") (double n))]
-         (if (pos? precision)
-           (let [length (.length v)
-                 lc (.charAt v (dec length))]
-             (if (= lc \0)
-               (recur (.substring v 0 (dec length)))
-               (if (= lc \.)
-                 (.substring v 0 (dec length))
-                 v)))
-           v)))
 
-     (defn num->compact
-       [n & {:keys [prefix suffix]}]
-       (when n
-         (let [abs (Math/abs (double n))]
-           (str
-             (if (neg? n) "-" "")
-             prefix
-             (cond
-               (> 10 abs) (format-opt-prec abs 2)
-               (> 100 abs) (format-opt-prec abs 1)
-               (> 1000 abs) (format-opt-prec abs 0)
-               (> 10000 abs) (str (format-opt-prec (/ abs 1000) 2) "K")
-               (> 100000 abs) (str (format-opt-prec (/ abs 1000) 1) "K")
-               (> 1000000 abs) (str (format-opt-prec (/ abs 1000) 0) "K")
-               (> 10000000 abs) (str (format-opt-prec (/ abs 1000000) 2) "M")
-               (> 100000000 abs) (str (format-opt-prec (/ abs 1000000) 1) "M")
-               (> 1000000000 abs) (str (format-opt-prec (/ abs 1000000) 0) "M")
-               (> 10000000000 abs) (str (format-opt-prec (/ abs 1000000000) 2) "B")
-               (> 100000000000 abs) (str (format-opt-prec (/ abs 1000000000) 1) "B")
-               (> 1000000000000 abs) (str (format-opt-prec (/ abs 1000000000) 0) "B")
-               :else (str (format-opt-prec (/ abs 1000000000000) 2) "T")
-               )
-             suffix))))
-     ))
+(defn format-opt-prec
+  [n precision]
+  (let [f (str "%." precision "f")]
+    (loop [v #?(:clj (format f n)
+                :cljs (gstring/format f n))]
+      (if (pos? precision)
+        (let [length (count v)
+              lc (nth v (dec length))]
+          (if (= lc \0)
+            (recur (subs v 0 (dec length)))
+            (if (= lc \.)
+              (subs v 0 (dec length))
+              v)))
+        v))))
+
+(defn num->compact
+  [n & {:keys [prefix suffix]}]
+  (when n
+    (let [n (double n)
+          abs (max n (- n))]
+      (str
+        (if (neg? n) "-" "")
+        prefix
+        (cond
+          (> 10 abs) (format-opt-prec abs 2)
+          (> 100 abs) (format-opt-prec abs 1)
+          (> 1000 abs) (format-opt-prec abs 0)
+          (> 10000 abs) (str (format-opt-prec (/ abs 1000) 2) "K")
+          (> 100000 abs) (str (format-opt-prec (/ abs 1000) 1) "K")
+          (> 1000000 abs) (str (format-opt-prec (/ abs 1000) 0) "K")
+          (> 10000000 abs) (str (format-opt-prec (/ abs 1000000) 2) "M")
+          (> 100000000 abs) (str (format-opt-prec (/ abs 1000000) 1) "M")
+          (> 1000000000 abs) (str (format-opt-prec (/ abs 1000000) 0) "M")
+          (> 10000000000 abs) (str (format-opt-prec (/ abs 1000000000) 2) "B")
+          (> 100000000000 abs) (str (format-opt-prec (/ abs 1000000000) 1) "B")
+          (> 1000000000000 abs) (str (format-opt-prec (/ abs 1000000000) 0) "B")
+          :else (str (format-opt-prec (/ abs 1000000000000) 2) "T")
+          )
+        suffix))))

@@ -1,11 +1,11 @@
 (ns full.core.log
-  #?(:clj (:require [clojure.tools.logging :as log]
-                    [clojure.java.io :refer [as-file as-url]]
-                    [full.core.config :refer [opt]]
-                    [full.core.sugar :refer [if-cljs]])
-     :clj (:import (org.slf4j MDC))
-     :cljs (:require-macros [full.core.log :refer [debug info]]))
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as string]
+    #?@(:clj [[clojure.tools.logging :as log]
+              [clojure.java.io :refer [as-file as-url]]
+              [full.core.config :refer [opt]]
+              [full.core.sugar :refer [if-cljs]]]))
+  #?(:clj (:import (org.slf4j MDC))
+     :cljs (:require-macros [full.core.log :refer [debug info]])))
 
 #?(:cljs
    (do
@@ -13,7 +13,7 @@
        (->> args
             (map #(if (string? %)
                    % (pr-str %)))
-            (s/join " ")))
+            (string/join " ")))
 
      (defn enable-log-print!
        "Set *print-fn* to console.log"
@@ -146,12 +146,12 @@
   "Evaluates all arguments and logs them with info loglevel. Returns the value
    of the last argument."
   [& args]
-    (info (s/join ", " args))
+    (info (string/join ", " args))
     (last args))
 
 (defn do-debug
   "Evaluates all arguments and logs them with debug loglevel. Returns the value
    of the last argument."
   [& args]
-    (debug (s/join ", " args))
+    (debug (string/join ", " args))
     (last args))

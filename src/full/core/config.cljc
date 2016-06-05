@@ -1,9 +1,9 @@
 (ns full.core.config
-  (:require [full.core.sugar :refer [map-map]])
-  #?(:clj (:require [full.core.sugar :refer :all]
-                    [clojure.tools.cli :refer [parse-opts]]
-                    [clojure.java.io :refer [as-file]]
-                    [clj-yaml.core :as yaml])))
+  (:require
+    [full.core.sugar :refer [map-map]]
+    #?@(:clj [[clojure.tools.cli :refer [parse-opts]]
+              [clojure.java.io :refer [as-file]]
+              [clj-yaml.core :as yaml]])))
 
 (defonce _config (atom {}))
 
