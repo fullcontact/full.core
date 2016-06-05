@@ -1,7 +1,7 @@
 (ns full.core.sugar-test
   #?(:clj (:require [clojure.test :refer :all]
                     [full.core.sugar :refer :all])
-     :cljs (:require [cemerick.cljs.test :refer-macros [deftest is done]]
+     :cljs (:require [cljs.test :refer-macros [deftest is]]
                      [full.core.sugar
                       :refer [?assoc insert-at remove-at ?conj ?hash-map update-first update-last ?update-in ?update
                               juxt-partition as-long number-or-string remove-prefix replace-prefix remove-suffix dq

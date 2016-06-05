@@ -17,16 +17,14 @@
                  [org.yaml/snakeyaml "1.15"]
                  [commons-codec/commons-codec "1.10"]]
   :aliases {"at" ["test-refresh"]
-            "ats" ["do" "clean," "cljsbuild" "auto" "test"]}
+            "ats" ["doo" "phantom"]}
   :aot :all
-  :cljsbuild {:test-commands {"test" ["phantomjs" :runner "target/test.js"]}
-              :builds [
-                       {:id "test"
-                        :notify-command ["phantomjs" :cljs.test/runner "target/test.js"]
-                        :source-paths ["src" "test"]
-                        :compiler {:output-to "target/test.js"
-                                   :optimizations :whitespace
-                                   :pretty-print true}}]}
+  :cljsbuild {:builds {:test {:source-paths ["src" "test"]
+                              :compiler {:output-to "target/test.js"
+                                         :main 'full.core.test-runner
+                                         :optimizations :simple
+                                         :pretty-print true}}}}
+  :doo {:build "test"}
   :profiles {:dev {:plugins [[com.jakemccrary/lein-test-refresh "0.15.0"]
                              [lein-cljsbuild "1.1.3"]
-                             [com.cemerick/clojurescript.test "0.3.3"]]}})
+                             [lein-doo "0.1.6"]]}})
