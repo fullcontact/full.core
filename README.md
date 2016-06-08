@@ -2,15 +2,16 @@
 
 [![Clojars Project](http://clojars.org/fullcontact/full.core/latest-version.svg)](http://clojars.org/fullcontact/full.core)
 
-Full.core is the core library for Clojure services at [FullContact](//fullcontact.com).
+Full.core is the core library for Clojure and ClojureScript services at [FullContact](//fullcontact.com).
 
 It contains the following:
 
 * Config management
 * Logging
-* Sugar - small extensions to Clojure's core and other common libraries
+* Sugar - extensions to clojure.core and other common libraries
 
-### Config management
+
+## Config management
 
 With `full.core.config` you can manage yaml configurations for your app.
 
@@ -38,3 +39,11 @@ We can use config as follows:
 
 Path to config file can be set via `-c path/to/file.yaml` or as `FULL_CONFIG`
 env variable.
+
+
+## Logging
+
+
+## Core extensions
+
+Similar to [plumbing](https://github.com/plumatic/plumbing)

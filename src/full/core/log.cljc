@@ -19,8 +19,7 @@
        "Set *print-fn* to console.log"
        []
        (set! *print-newline* false)
-       (set! *print-fn* (fn [& args] (.log js/console (format-log args)))))
-     )
+       (set! *print-fn* (fn [& args] (.log js/console (format-log args))))))
 
    :clj
    (do
@@ -139,8 +138,7 @@
               (.doConfigure configurator (as-url (check-config-file config-file))))
             (catch Exception _))  ; StatusPrinter will handle this
           (ch.qos.logback.core.util.StatusPrinter/printInCaseOfErrorsOrWarnings
-            context))))
-     ))
+            context))))))
 
 (defn do-info
   "Evaluates all arguments and logs them with info loglevel. Returns the value

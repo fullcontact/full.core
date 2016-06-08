@@ -12,7 +12,6 @@
 
 ;;; Macro helpers
 
-
 #?(:clj
    (do
      (defn- cljs-env?
@@ -129,7 +128,6 @@
 
 ;;; List helpers
 
-
 (defn insert-at
   "Returns the sequence s with the item i inserted at 0-based index idx."
   [s idx i]
@@ -220,7 +218,6 @@
 
 ;;; String helpers
 
-
 (defn as-long [s]
   (when s
     #?(:clj (try
@@ -228,8 +225,7 @@
               (catch NumberFormatException _))
        :cljs (let [n (js/parseInt (str s))]
                (when-not (js/isNaN n)
-                 n))
-       )))
+                 n)))))
 
 (defn number-or-string [s]
   (let [s (str s)]
@@ -295,8 +291,6 @@
                                   (g) (repeatedly 3 f)
                                   (repeatedly 12 f))))))
 
-#?(:clj (def ^{:deprecated "Use uuids instead"} uuid uuids))
-
 #?(:clj
    (do
      (defn ascii
@@ -317,8 +311,7 @@
        (->> (byte-buffer->byte-vector byte-buffer)
             (into-array Byte/TYPE)
             (Hex/encodeHex)
-            (string/join)))
-     ))
+            (string/join)))))
 
 
 ;;; Metadata helpers
@@ -350,9 +343,8 @@
        `(with-mname ~meta-name (fn ~args ~@body)))
 
      (defmethod print-method clojure.lang.AFunction [v ^java.io.Writer w]
-       ; if function has :name in metadata, this will make it appear in (print ...)
-       (.write w (or (mname v) (str v))))
-     ))
+       ; if function has :name in metadata, this will make it appear in (print)
+       (.write w (or (mname v) (str v))))))
 
 
 ;;;; Conditional threading
@@ -365,9 +357,9 @@
 
      (defmacro when->>
        "Using when + ->> inside ->> threads
-        Takes a single condition and one or more forms that will be executed like a
-        regular ->>, if condition is true. Will pass the initial value if condition
-        is false.
+        Takes a single condition and one or more forms that will be executed
+        like a regular ->>, if condition is true.
+        Will pass the initial value if condition is false.
         Contition can take the initial value as argument, it needs to be
         referenced as '%' (eg, (some-condition %)
         (->> (range 10) (map inc) (when->> true (filter even?)))
@@ -395,8 +387,8 @@
      (defmacro when->>->
        "Using when + -> inside ->> threads.
         Takes a single condition cnd and multiple forms that will be exectued as
-        a regular ->>, if the condition is true (otherwise the initial value will
-        be passed to next form).
+        a regular ->>, if the condition is true (otherwise the initial value
+        will be passed to next form).
         Contition can take the initial value as argument, it needs to be
         referenced as '%' (eg, (some-condition %)
        (->> (range 3) (map inc) (when->>-> (seq %) (into [\"header\"])))
@@ -409,8 +401,8 @@
 
      (defmacro if->>
        "Using if + ->> inside ->> threads
-       Takes a single condition and one or more forms that will be executed if the
-       condition is true.
+       Takes a single condition and one or more forms that
+       will be executed if the condition is true.
        An else block can be passed in by separating forms with :else keyword.
         Contition can take the initial value as argument, it needs to be
         referenced as '%' (eg, (some-condition %)
@@ -431,8 +423,7 @@
        => x3"
        [& threads]
        `(-> ~(last threads)
-            ~@(butlast threads)))
-   ))
+            ~@(butlast threads)))))
 
 
 ;;; Helpers for measuring execution time
@@ -492,6 +483,5 @@
           (> 10000000000 abs) (str (format-opt-prec (/ abs 1000000000) 2) "B")
           (> 100000000000 abs) (str (format-opt-prec (/ abs 1000000000) 1) "B")
           (> 1000000000000 abs) (str (format-opt-prec (/ abs 1000000000) 0) "B")
-          :else (str (format-opt-prec (/ abs 1000000000000) 2) "T")
-          )
+          :else (str (format-opt-prec (/ abs 1000000000000) 2) "T"))
         suffix))))
