@@ -27,6 +27,14 @@
                                          :optimizations :simple
                                          :pretty-print true}}}}
   :doo {:build "test"}
+  :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version" "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag" "--no-sign"]
+                  ["deploy"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]]
   :profiles {:dev {:plugins [[com.jakemccrary/lein-test-refresh "0.15.0"]
                              [lein-cljsbuild "1.1.3"]
                              [lein-doo "0.1.6"]]}})
