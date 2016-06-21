@@ -15,6 +15,7 @@
                  [ch.qos.logback/logback-classic "1.1.3" :exclusions [org.slf4j/slf4j-api]]
                  [clj-yaml "0.4.0" :exclusions [org.yaml/snakeyaml]]
                  [org.yaml/snakeyaml "1.15"]
+                 [ns-tracker "0.2.2"]
                  [commons-codec/commons-codec "1.10"]]
   :aliases {"at" ["test-refresh"]
             "ats" ["doo" "phantom"]}
