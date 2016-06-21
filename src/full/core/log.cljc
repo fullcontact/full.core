@@ -73,7 +73,7 @@
        [& args]
        `(if-cljs
           (.info js/console (full.core.log/format-log [~@args]))
-          (log/info context "XXX" ~@args "YYY")))
+          (log/info context ~@args)))
 
      (defmacro warn [& args]
        `(if-cljs
