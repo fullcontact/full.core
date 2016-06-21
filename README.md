@@ -46,7 +46,20 @@ env variable.
 
 ## Logging
 
+`full.core.log` is using slf4j under the hood & logging config can be loaded
+via `(full.core.log/configure)`. Path of the XML logging config can be set via
+`log-config` field in your YAML config.
+
+`full.core.log` provides logging with MDC contexts:
+
+```
+(log/with-mdc {:foo "bar" :baz "foo"} "Message")
+```
+
+`full.core.log/do-info` and `full.core.log/do-debug` will log all arguments
+and return the value of last (it works similar to Haskell's [Debug.Trace](https://hackage.haskell.org/package/base-4.9.0.0/docs/Debug-Trace.html)).
 
 ## Core extensions
 
-Similar to [plumbing](https://github.com/plumatic/plumbing)
+`full.core.sugar` contains extensions to standard data types and is similar to
+[plumbing](https://github.com/plumatic/plumbing) and friends.
