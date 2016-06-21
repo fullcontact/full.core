@@ -10,6 +10,9 @@ It contains the following:
 * Logging
 * Sugar - extensions to clojure.core and other common libraries
 
+* edn helpers (Clojure only)
+* `clj-time` wrapper (Clojure only)
+
 
 ## Config management
 
