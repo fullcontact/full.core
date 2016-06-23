@@ -1,6 +1,6 @@
 # full.core
 
-[![Clojars Project](http://clojars.org/fullcontact/full.core/latest-version.svg)](http://clojars.org/fullcontact/full.core)
+[![Clojars Project](https://img.shields.io/clojars/v/fullcontact/full.core.svg)](https://clojars.org/fullcontact/full.core)
 [![Build Status](https://travis-ci.org/fullcontact/full.core.svg?branch=master)](https://travis-ci.org/fullcontact/full.core)
 
 Full.core is the core library for Clojure and ClojureScript services at [FullContact](//fullcontact.com).
