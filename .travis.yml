@@ -1,0 +1,5 @@
+language: clojure
+install: lein install
+script: "lein test"
+jdk:
+  - oraclejdk7
