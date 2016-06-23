@@ -1,5 +1,4 @@
 language: clojure
-install: lein install
-script: "lein test"
+lein: lein2
 jdk:
-  - oraclejdk7
+  - oraclejdk8
