@@ -42,7 +42,8 @@ We can use config as follows:
 ```
 
 Path to config file can be set via `-c path/to/file.yaml` or as `FULL_CONFIG`
-env variable.
+env variable. config loader will default to reading `dev.yaml` in project's
+root directory if no explicit config path is provided.
 
 
 ## Logging
@@ -60,7 +61,10 @@ via `(full.core.log/configure)`. Path of the XML logging config can be set via
 `full.core.log/do-info` and `full.core.log/do-debug` will log all arguments
 and return the value of last (it works similar to Haskell's [Debug.Trace](https://hackage.haskell.org/package/base-4.9.0.0/docs/Debug-Trace.html)).
 
+
 ## Core extensions
 
-`full.core.sugar` contains extensions to standard data types and is similar to
+* `full.core.sugar` contains extensions to standard data types and is similar to
 [plumbing](https://github.com/plumatic/plumbing) and friends.
+
+* `full.core.time` contains extensions to [clj-time](https://github.com/clj-time/clj-time).
