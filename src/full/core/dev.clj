@@ -34,14 +34,20 @@
 
 ;;; File I/O
 
+(defn- expand-tilde [f]
+  (when-let [first-char (some-> f first)]
+    (if (= \~ first-char)
+      (str (System/getenv "HOME") (.substring f 1))
+      f)))
+
 (defn slurp-edn [f & opts]
-  (edn/read-string (apply slurp f opts)))
+  (edn/read-string (apply slurp (expand-tilde f) opts)))
 
 (defn slurp-lines [f & opts]
-  (s/split (apply slurp f opts) #"\n"))
+  (s/split (apply slurp (expand-tilde f) opts) #"\n"))
 
 (defn spit-pprint [f content & opts]
-  (with-open [^java.io.Writer writer (apply clojure.java.io/writer f opts)]
+  (with-open [^java.io.Writer writer (apply clojure.java.io/writer (expand-tilde f) opts)]
     (pprint content writer)))
 
 
