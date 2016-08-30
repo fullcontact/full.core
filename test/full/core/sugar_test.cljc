@@ -5,7 +5,7 @@
                      [full.core.sugar
                       :refer [?assoc insert-at remove-at ?conj ?hash-map update-first update-last ?update-in ?update
                               juxt-partition as-long number-or-string remove-prefix replace-prefix remove-suffix dq
-                              query-string num->compact]
+                              query-string num->compact re-quote]
                       :refer-macros [when->> when->]])))
 
 (deftest test-?assoc
@@ -152,3 +152,6 @@
   (is (= (number-or-string "123") 123))
   (is (= (number-or-string 123) 123))
   (is (= (number-or-string "abc") "abc")))
+
+(deftest test-re-quote
+  (is (= (re-quote "$1") "\\$1")))

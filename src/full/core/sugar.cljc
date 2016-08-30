@@ -313,6 +313,13 @@
             (Hex/encodeHex)
             (string/join)))))
 
+(defn re-quote
+  "Returns a literal regex pattern for given string, similiar to Java's Pattern.quote."
+  [s]
+  ; from http://stackoverflow.com/a/11981277"
+  (let [special (set ".?*+^$[]\\(){}|")
+        escfn #(if (special %) (str \\ %) %)]
+    (apply str (map escfn s))))
 
 ;;; Metadata helpers
 
