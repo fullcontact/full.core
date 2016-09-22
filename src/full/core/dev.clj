@@ -27,9 +27,9 @@
 (def bell-char (char 7))
 
 (defmacro do-bell
-  "Calls the function c, rings a terminal bell when done."
+  "Evaluates c, rings a terminal bell when done and returns the result."
   [c]
-  (let [res c] (println bell-char) c))
+  (let [res c] (println bell-char) res))
 
 
 ;;; File I/O
@@ -49,6 +49,11 @@
 (defn spit-pprint [f content & opts]
   (with-open [^java.io.Writer writer (apply clojure.java.io/writer (expand-tilde f) opts)]
     (pprint content writer)))
+
+(defn pwd
+  "Returns current working directory"
+  []
+  (.getAbsolutePath (java.io.File "")))
 
 
 ;;; Dynamic code reloading

@@ -356,7 +356,6 @@
 
 ;;;; Conditional threading
 
-
 #?(:clj
    (do
      (defn- cndexpand [cnd value]

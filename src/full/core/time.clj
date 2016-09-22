@@ -92,7 +92,7 @@
   (tc/from-long epoch))
 
 (defn epoch<-dt
-  "Creates a DateTime object from a (long) unix timestamp"
+  "Creates a (long) unix timestamp from DateTime object"
   [dt]
   (tc/to-long dt))
 
