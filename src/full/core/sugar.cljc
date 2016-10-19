@@ -174,7 +174,8 @@
 (defn filter-indexed [pred coll]
   (filter pred (map-indexed vector coll)))
 
-(defn some-when
+; DEPRECATED: first + filter is clearer.
+(defn ^:deprecated some-when
   "Similiar to some but returns matching value instead of predicates result."
   [pred coll]
   (some #(when (pred %) %) coll))
