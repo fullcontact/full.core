@@ -20,8 +20,8 @@
   (is (= (d->iso-d (t/local-date 0 1 2)) "0000-01-02")))
 
 (deftest rfc822-date-parsing
-  (is (= (dt<-rfc822-ts "Fri, 12 Jun 2015 17:50:00 UTC")
-         (t/date-time 2015 6 12 17 50 0 0))))
+  (is (= (str (dt<-rfc822-ts "Fri, 12 Jun 2015 17:50:00 UTC"))
+         (str (t/date-time 2015 6 12 17 50 0 0)))))
 
 (deftest relative-date-formatting
   (is (= (-> (t/now) (t/minus (t/seconds 10)) (dt->rel)) "few seconds ago"))
