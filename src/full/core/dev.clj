@@ -31,6 +31,15 @@
   [c]
   (let [res c] (println bell-char) res))
 
+; borrowed from midje.config. Thanks, @marick!
+(defn running-in-repl? []
+  (try
+    (throw (Exception.))
+    (catch Exception ex
+      (->> (filter #(.contains (str %) "clojure.main$repl$read_eval_print")
+                   (.getStackTrace ex))
+           (seq) boolean))))
+
 
 ;;; File I/O
 
@@ -57,6 +66,7 @@
 
 
 ;;; Dynamic code reloading
+
 (defn- check-namespace-changes [track on-reload]
   (some->> (track)
            (not-empty)
