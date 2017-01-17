@@ -108,6 +108,14 @@
    (letfn [(mapper [[k v]] [(key-fn k)  (value-fn v)])]
      (into {} (map mapper m)))))
 
+(defn index-by
+  "Returns a map of the values in coll indexed by the result of applying kf.
+   A value mapping function vf can be provided too."
+  ([kf coll]
+   (index-by kf identity coll))
+  ([kf vf coll]
+   (into {} (map (juxt kf vf)) coll)))
+
 (defn remap
   "Remap keys of `m` based on `mapping`."
   [m mapping]
