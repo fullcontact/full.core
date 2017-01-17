@@ -15,6 +15,22 @@
   (is (= (?assoc {:foo "bar"} :foo nil) {:foo "bar"}))
   (is (= (?assoc {} :empty nil) {})))
 
+(deftest test-index-by
+  (is (= (index-by :id nil) {}))
+  (is (= (index-by :id []) {}))
+  (is (= (index-by :id [{:id 1 :name "A"}
+                        {:id 2 :name "B"}
+                        {:id 3 :name "C"}
+                        {:id 2 :name "D"}])
+         {1 {:id 1 :name "A"}
+          2 {:id 2 :name "D"}
+          3 {:id 3 :name "C"}}))
+  (is (= (index-by :id :name [{:id 1 :name "A"}
+                              {:id 2 :name "B"}
+                              {:id 3 :name "C"}
+                              {:id 2 :name "D"}])
+         {1 "A" 2 "D" 3 "C"})))
+
 (deftest test-remove-prefix
   (is (= (remove-prefix "aaabbb" "aaa") "bbb"))
   (is (= (remove-prefix "aaabbb" "ccc") "aaabbb"))
