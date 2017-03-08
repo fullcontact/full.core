@@ -5,7 +5,7 @@
                      [full.core.sugar
                       :refer [?assoc insert-at remove-at ?conj ?hash-map update-first update-last ?update-in ?update
                               juxt-partition as-long number-or-string remove-prefix replace-prefix remove-suffix dq
-                              query-string num->compact re-quote]
+                              query-string num->compact re-quote index-by idx-of]
                       :refer-macros [when->> when->]])))
 
 (deftest test-?assoc
@@ -171,3 +171,8 @@
 
 (deftest test-re-quote
   (is (= (re-quote "$1") "\\$1")))
+
+(deftest test-idx-of
+  (is (= 0 (idx-of (range 1 10) 1)))
+  (is (= -1 (idx-of (range 1 10) 11)))
+  (is (= 8 (idx-of (range 1 10) 9))))

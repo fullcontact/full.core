@@ -191,8 +191,11 @@
 (defn idx-of
   "Similar to .indexOf, but works with lazy collections as well."
   [collection item]
-  (or (first (some-when (fn [{v 1}] (= v item))
-                        (map-indexed vector collection)))
+  (or (->> collection
+           (map-indexed vector)
+           (some (fn [[i v]]
+                   (when (= v item)
+                     i))))
       -1))
 
 (defn update-last
