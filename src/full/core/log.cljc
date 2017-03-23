@@ -9,17 +9,11 @@
 
 #?(:cljs
    (do
-     (defn- format-log [args]
-       (->> args
-            (map #(if (string? %)
-                   % (pr-str %)))
-            (string/join " ")))
-
      (defn enable-log-print!
        "Set *print-fn* to console.log"
        []
        (set! *print-newline* false)
-       (set! *print-fn* (fn [& args] (.log js/console (format-log args))))))
+       (set! *print-fn* (fn [& args] (apply js/console.log args)))))
 
    :clj
    (do
@@ -51,38 +45,38 @@
 
      (defmacro log [& args]
        `(if-cljs
-          (.log js/console (full.core.log/format-log [~@args]))
+          (do (js/console.log ~@args) nil)
           (log/debug context ~@args)))
 
      (defmacro trace
        "Logs args with trace loglevel. Returns nil."
        [& args]
        `(if-cljs
-          (.trace js/console (full.core.log/format-log [~@args]))
+          (do (js/console.trace ~@args) nil)
           (log/trace context ~@args)))
 
      (defmacro debug
        "Logs args with debug loglevel. Returns nil."
        [& args]
        `(if-cljs
-          (.debug js/console (full.core.log/format-log [~@args]))
+          (do (js/console.debug ~@args) nil)
           (log/debug context ~@args)))
 
      (defmacro info
        "Logs args with info loglevel. Returns nil."
        [& args]
        `(if-cljs
-          (.info js/console (full.core.log/format-log [~@args]))
+          (do (js/console.info ~@args) nil)
           (log/info context ~@args)))
 
      (defmacro warn [& args]
        `(if-cljs
-          (.warn js/console (full.core.log/format-log [~@args]))
+          (do (js/console.warn ~@args) nil)
           (log/warn context ~@args)))
 
      (defmacro error [x & more]
        `(if-cljs
-          (.error js/console (full.core.log/format-log [~x ~@more]))
+          (do (js/console.warn ~x ~@more) nil)
           (let [x# ~x]
             (if (instance? Throwable x#)
               (log/error x# context ~@more)
@@ -99,10 +93,12 @@
        "Begins grouped log."
        [& args]
        `(if-cljs
-          (if (.-groupCollapsed js/console)
-            (.groupCollapsed js/console (full.core.log/format-log [~@args]))
-            ; fallback for older browsers
-            (.log js/console (full.core.log/format-log [~@args])))
+          (do
+            (if (.-groupCollapsed js/console)
+              (js/console.groupCollapsed ~@args)
+              ; fallback for older browsers
+              (js/console.log ~@args))
+            nil)
           (do)))
 
      (defmacro group-end
@@ -110,7 +106,8 @@
        []
        `(if-cljs
           (when (.-groupEnd js/console)
-            (.groupEnd js/console))
+            (js/console.groupEnd)
+            nil)
           (do)))
 
        ;;; Configuration. Clojure only.
