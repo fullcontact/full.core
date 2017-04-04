@@ -5,7 +5,7 @@
                      [full.core.sugar
                       :refer [?assoc insert-at remove-at ?conj ?hash-map update-first update-last ?update-in ?update
                               juxt-partition as-long number-or-string remove-prefix replace-prefix remove-suffix dq
-                              query-string num->compact re-quote index-by idx-of]
+                              query-string num->compact re-quote index-by idx-of deep-merge]
                       :refer-macros [when->> when->]])))
 
 (deftest test-?assoc
@@ -176,3 +176,7 @@
   (is (= 0 (idx-of (range 1 10) 1)))
   (is (= -1 (idx-of (range 1 10) 11)))
   (is (= 8 (idx-of (range 1 10) 9))))
+
+(deftest test-deep-merge
+  (is (= (deep-merge {:a {:b 1}} {:a {:b 2 :c "d"}})
+         {:a {:b 2 :c "d"}})))

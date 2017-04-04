@@ -108,6 +108,13 @@
    (letfn [(mapper [[k v]] [(key-fn k)  (value-fn v)])]
      (into {} (map mapper m)))))
 
+(defn deep-merge
+  "Deep merge two maps"
+  [& values]
+  (if (every? map? (filter identity values))
+    (apply merge-with deep-merge values)
+    (last values)))
+
 (defn index-by
   "Returns a map of the values in coll indexed by the result of applying kf.
    A value mapping function vf can be provided too."
