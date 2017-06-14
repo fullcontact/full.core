@@ -13,7 +13,9 @@
   (is (= (?assoc {} :foo "bar") {:foo "bar"}))
   (is (= (?assoc {:foo "bar"} :foo "baz") {:foo "baz"}))
   (is (= (?assoc {:foo "bar"} :foo nil) {:foo "bar"}))
-  (is (= (?assoc {} :empty nil) {})))
+  (is (= (?assoc {} :empty nil) {}))
+  (is (= (?assoc nil :empty nil) {}))
+  (is (= (?assoc nil :foo "bar") {:foo "bar"})))
 
 (deftest test-index-by
   (is (= (index-by :id nil) {}))

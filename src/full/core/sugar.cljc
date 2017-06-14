@@ -34,7 +34,7 @@
   (->> (partition 2 kvs)
        (remove (comp nil? second))
        (map vec)
-       (into m)))
+       (into (or m {}))))
 
 (defn assoc-first
   "Replaces value of key `k` in map `m` with the first value  sequence
