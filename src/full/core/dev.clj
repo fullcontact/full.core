@@ -41,6 +41,23 @@
            (seq) boolean))))
 
 
+;;; Simple color printing
+
+(def ^:private ansi-colors
+  {:green "[32m"
+   :red "[31m"
+   :yellow "[33m"
+   :blue "[34m"})
+
+(defn ^:private colored-str [code s]
+  (str "\u001b" (get ansi-colors code) (apply str s) "\u001b[0m"))
+
+(defn green-str [& s] (colored-str :green s))
+(defn red-str [& s] (colored-str :red s))
+(defn yellow-str [& s] (colored-str :yellow s))
+(defn blue-str [& s] (colored-str :blue s))
+
+
 ;;; File I/O
 
 (defn- expand-tilde [f]
