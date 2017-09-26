@@ -10,7 +10,6 @@
 
 (deftest test-?assoc
   (is (= (?assoc {} :foo "bar") {:foo "bar"}))
-  (is (= (?assoc {} :foo "bar") {:foo "bar"}))
   (is (= (?assoc {:foo "bar"} :foo "baz") {:foo "baz"}))
   (is (= (?assoc {:foo "bar"} :foo nil) {:foo "bar"}))
   (is (= (?assoc {} :empty nil) {}))
