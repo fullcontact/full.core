@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :repo}
   :deploy-repositories [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/tools.cli "0.3.5"]
                  [org.clojure/tools.logging "0.3.1"]
@@ -15,7 +15,7 @@
                  [ch.qos.logback/logback-classic "1.1.7" :exclusions [org.slf4j/slf4j-api]]
                  [clj-yaml "0.4.0" :exclusions [org.yaml/snakeyaml]]
                  [org.yaml/snakeyaml "1.17"]
-                 [clj-time "0.12.2"]
+                 [clj-time "0.15.0"]
                  [ns-tracker "0.3.1"]
                  [commons-codec/commons-codec "1.10"]]
   :aliases {"at" ["test-refresh"]
