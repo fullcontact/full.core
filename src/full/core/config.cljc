@@ -1,7 +1,8 @@
 (ns full.core.config
   (:require
     [full.core.sugar :refer [map-map]]
-    #?@(:clj [[clojure.tools.cli :refer [parse-opts]]
+    #?@(:clj [[clojure.walk :refer [prewalk]]
+              [clojure.tools.cli :refer [parse-opts]]
               [clojure.java.io :refer [as-file]]
               [clj-yaml.core :as yaml]])))
 
@@ -14,6 +15,14 @@
    (do
      (def config-cli-options
        [["-c" "--config name" "Config filename"]])
+
+     (def ^:private re-env #"^\$\{([A-Z_0-9]+)\}$")
+
+     (defn- with-env-varialbes [config]
+       (prewalk #(if-let [[_ v] (when (string? %)
+                                 (re-matches re-env %))]
+                  (System/getenv v) %)
+                config))
 
      (defn config-file
        "Loads config from a file. Path is taken either from command line -c flag,
@@ -42,6 +51,7 @@
                                  (-> (config-file)
                                      (slurp)
                                      (yaml/parse-string)
+                                     (with-env-varialbes)
                                      (normalize-config))
                                  ; else - already configured, return exisiting config
                                  config))))))

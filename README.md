@@ -29,6 +29,7 @@ hosts:
   - host3
 parent:
   child: value
+secret-key: "${SECRET_KEY}"
 ```
 
 We can use config as follows:
@@ -45,6 +46,8 @@ Path to config file can be set via `-c path/to/file.yaml` or as `FULL_CONFIG`
 env variable. config loader will default to reading `dev.yaml` in project's
 root directory if no explicit config path is provided.
 
+You can load values from environment variables with the "${VAR_NAME}" syntax.
+They will behave like regular strings when loaded via `opt`.
 
 ## Logging
 
