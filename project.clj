@@ -6,7 +6,7 @@
             :distribution :repo}
   :deploy-repositories [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]
   :dependencies [[org.clojure/clojure "1.10.1"]
-                 [org.clojure/clojurescript "1.9.293"]
+                 [org.clojure/clojurescript "1.10.597"]
                  [org.clojure/tools.cli "0.3.5"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.slf4j/slf4j-api "1.7.21"]
