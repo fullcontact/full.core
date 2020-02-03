@@ -1,4 +1,4 @@
 language: clojure
 lein: lein
 jdk:
-  - oraclejdk8
+  - openjdk8
